@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Alert Website</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* General Styling */
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #013a6b;
+            --accent-color: #ffcc00;
+            --danger-color: #e74c3c;
+            --success-color: #2ecc71;
+            --light-color: #121212; /* Changed to dark */
+            --dark-color: #f0f0f0; /* Changed to light */
+            --card-bg: #1e1e1e; /* Dark card background */
+            --text-muted: #aaaaaa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            overflow-x: hidden;
+        }
+        
+        /* Header Styling */
+        header {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: #fff;
+            padding: 15px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            animation: headerSlideDown 0.8s ease-out;
+        }
+        
+        @keyframes headerSlideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            flex-wrap: wrap;
+        }
+        
+        nav ul li {
+            margin: 0 15px;
+            position: relative;
+        }
+        
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+        }
+        
+        nav ul li a i {
+            margin-right: 8px;
+        }
+        
+        nav ul li a:hover {
+            color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+        
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+        
+        /* Hero Section */
+        #home {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1518593929011-2d260d1e0429?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
+            color: white;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #home::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('one1.png');
+            background-size: cover;
+            width: 1268;
+            height: 938;        
+            z-index: -1;
+        }
+        
+        #home h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 1s ease-out, glow 2s infinite alternate;
+        }
+        
+        #home p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            max-width: 800px;
+            animation: fadeInUp 1s ease-out 0.2s forwards;
+            opacity: 0;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: var(--accent-color);
+            color: var(--secondary-color);
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease-out 0.4s forwards, pulse 2s infinite;
+            opacity: 0;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            background: #ffd633;
+            animation: none;
+        }
+        
+        .emergency-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--danger-color);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.6);
+            cursor: pointer;
+            z-index: 999;
+            transition: all 0.3s ease;
+            animation: pulse 1.5s infinite, shake 3s infinite;
+        }
+        
+        .emergency-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.8);
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(231, 76, 60, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+            }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            2% { transform: rotate(-5deg); }
+            4% { transform: rotate(5deg); }
+            6% { transform: rotate(-5deg); }
+            8% { transform: rotate(5deg); }
+            10% { transform: rotate(0deg); }
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 204, 0, 0.8);
+            }
+        }
+        
+        /* Section Styling */
+        section {
+            padding: 80px 20px;
+            text-align: center;
+        }
+        
+        section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+            position: relative;
+            display: inline-block;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        section h2::after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 4px;
+            bottom: -10px;
+            left: 25%;
+            background: var(--primary-color);
+            border-radius: 2px;
+            animation: expand 1s ease-out 0.5s forwards;
+            transform-origin: left;
+            transform: scaleX(0);
+        }
+        
+        @keyframes expand {
+            to {
+                transform: scaleX(1);
+            }
+        }
+        
+        section p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: var(--text-muted);
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+        
+        /* Alerts Section */
+        #alerts {
+            background-color: var(--light-color);
+        }
+        
+        #alerts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .alert {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            text-align: left;
+            animation: fadeInUp 0.8s ease-out, float 6s ease-in-out infinite;
+            transform: translateY(0);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .alert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .alert:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            animation: none;
+        }
+        
+        .alert:hover::before {
+            width: 8px;
+            background: var(--accent-color);
+        }
+        
+        .alert h3 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .alert h3 i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .alert p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .alert .alert-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .alert.emergency {
+            background: linear-gradient(135deg, var(--card-bg), #2a1a1a);
+            animation: pulseBackground 2s infinite alternate, fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes pulseBackground {
+            from {
+                box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
+            }
+        }
+        
+        .alert.emergency h3 {
+            color: var(--danger-color);
+        }
+        
+        .alert.emergency h3 i {
+            color: var(--danger-color);
+        }
+        
+        .alert.emergency::before {
+            background: var(--danger-color);
+        }
+        
+        /* Resources Section */
+        #resources {
+            background: linear-gradient(45deg, #0a0a0a, #1a1a2e);
+        }
+        
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .resource-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeInUp 0.8s ease-out, float 6s ease-in-out infinite 1s;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            animation: none;
+        }
+        
+        .resource-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .resource-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+        
+        .resource-card p {
+            font-size: 1rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        .resource-link {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: auto;
+            animation: pulse 2s infinite;
+        }
+        
+        .resource-link:hover {
+            background: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+            animation: none;
+        }
+        
+        /* Weather Detection Section */
+        #weather-detection {
+            background: var(--light-color);
+        }
+        
+        .weather-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .weather-card {
+            background: linear-gradient(135deg, #4a90e2, #013a6b);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out, float 6s ease-in-out infinite 0.5s;
+        }
+        
+        .weather-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
+        }
+        
+        .weather-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            animation: none;
+        }
+        
+        .weather-card:hover::before {
+            transform: rotate(60deg);
+        }
+        
+        .weather-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .weather-card .temp {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 20px 0;
+            animation: pulse 3s infinite;
+        }
+        
+        .weather-card .details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .weather-card .detail {
+            text-align: center;
+        }
+        
+        .weather-card .detail i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            animation: bounce 2s infinite;
+        }
+        
+        /* Contact Section */
+        #contact {
+            background: linear-gradient(45deg, #013a6b, #4a90e2);
+            color: white;
+        }
+        
+        #contact h2 {
+            color: white;
+        }
+        
+        #contact h2::after {
+            background: var(--accent-color);
+        }
+        
+        .contact-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .contact-info {
+            flex: 1;
+            min-width: 300px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            animation: fadeInLeft 1s ease-out;
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .contact-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+        
+        .contact-info p {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        
+        .contact-info i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+        }
+        
+        .contact-form {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(30, 30, 30, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeInRight 1s ease-out;
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #333;
+            color: white;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.5);
+            outline: none;
+        }
+        
+        .submit-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            animation: pulse 2s infinite;
+        }
+        
+        .submit-btn:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: none;
+        }
+        
+        /* Footer Styling */
+        footer {
+            text-align: center;
+            background: #0a0a0a;
+            color: #fff;
+            padding: 30px 0;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .footer-section p, .footer-section a {
+            color: #aaa;
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: var(--accent-color);
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            animation: bounce 2s infinite;
+        }
+        
+        .social-icons a:hover {
+            color: var(--accent-color);
+            transform: translateY(-5px);
+            animation: none;
+        }
+        
+        .footer-bottom {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate {
+            opacity: 0;
+            animation: fadeInUp 1s ease-out forwards;
+        }
+        
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
+        
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
+        
+        .delay-3 {
+            animation-delay: 0.6s;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav ul li {
+                margin: 0 10px;
+            }
+            
+            #home h1 {
+                font-size: 2.5rem;
+            }
+            
+            #home p {
+                font-size: 1.2rem;
+            }
+            
+            section h2 {
+                font-size: 2rem;
+            }
+            
+            .weather-card {
+                width: 100%;
+                max-width: 350px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav ul li {
+                margin: 5px 0;
+            }
+            
+            #home h1 {
+                font-size: 2rem;
+            }
+            
+            .cta-button {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#home"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#alerts"><i class="fas fa-bell"></i> Alerts</a></li>
+                <li><a href="#resources"><i class="fas fa-book"></i> Resources</a></li>
+                <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSc50XD9QCwqzvXmZGmWTo58cT3bEuKAEmvCKxiIUZr5IRPNtw/viewform"><i class="fas fa-envelope"></i> Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home">
+        <h1>Disaster Alert System</h1>
+        <p>Real-time alerts and critical information to keep you safe during emergencies</p>
+        <a href="#alerts" class="cta-button">View Current Alerts</a>
+    </section>
+
+    <section id="alerts" class="animate">
+        <h2>Latest Alerts</h2>
+        <p>Stay informed about potential hazards in your area</p>
+        <div id="alerts-container">
+            <div class="alert animate delay-1">
+                <h3><i class="fas fa-exclamation-triangle"></i><a href="Wet-DECT.html"> Flood & Earthquick</a></h3>
+                <p>Flood: Move to higher ground immediately and avoid walking or driving through floodwaters.
+                    <br>
+                    Earthquake: Drop, cover, and hold on under sturdy furniture until shaking stops.
+                    
+                    .</p>
+                <div class="alert-meta">
+                    <span><i class="far fa-clock"></i> 2 hours ago</span>
+                    <span><i class="fas fa-map-marker-alt"></i> Coastal Regions</span>
+                </div>
+            </div>
+            <div class="alert emergency animate delay-2">
+                <h3><i class="fas fa-skull-crossbones"></i> Extreme Heat Warning</h3>
+                <p>Dangerously high temperatures forecasted for the next 3 days. Heat index values may reach 110°F (43°C). Stay hydrated and avoid prolonged sun exposure.</p>
+                <div class="alert-meta">
+                    <span><i class="far fa-clock"></i> 5 hours ago</span>
+                    <span><i class="fas fa-map-marker-alt"></i> Southern Districts</span>
+                </div>
+            </div>
+            <div class="alert animate delay-3">
+                <h3><i class="fas fa-wind"></i><a href="Rescue.html">Rescue Team location</a> </h3>
+                <p>Highly trained professionals equipped to handle emergencies, providing swift response during disasters. They perform search-and-rescue operations, medical aid, and evacuation to save lives and ensure public safety in critical situations..</p>
+                <div class="alert-meta">
+                    <span><i class="far fa-clock"></i> 1 day ago</span>
+                    <span><i class="fas fa-map-marker-alt"></i> Eastern Seaboard</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="resources" class="animate">
+        <h2>Emergency Resources</h2>
+        <p>Essential information and tools to help you prepare and respond</p>
+        <div class="resources-grid">
+            <div class="resource-card animate delay-3">
+                <div class="resource-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3>Evacuation Plans</h3>
+                <p>Maps and routes for safe evacuation from your area in case of emergency.</p>
+                <a href="#" class="resource-link">View Plans</a>
+            </div>
+            <div class="resource-card animate delay-1">
+                <div class="resource-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Safety Guidelines</h3>
+                <p>Learn how to protect yourself and your family during different types of disasters.</p>
+                <a href="safety.html" class="resource-link">View Guidelines</a>
+            </div>
+            <div class="resource-card animate delay-2">
+                <div class="resource-icon">
+                    <i class="fas fa-phone-alt"></i>
+                </div>
+                <h3>Emergency Contacts</h3>
+                <p>Important phone numbers and contacts for immediate assistance during crises.</p>
+                <a href="emergency.html" class="resource-link">View Contacts</a>
+            </div>
+           
+        </div>
+    </section>
+
+   
+
+    <section id="contact" class="animate">
+        
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <p>Providing real-time disaster alerts and emergency information to keep communities safe since 2010.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#home">Home</a>
+                <a href="#alerts">Alerts</a>
+                <a href="#resources">Resources</a>
+                
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h3>Subscribe</h3>
+                <p>Get email alerts for emergencies in your area.</p>
+                <form>
+                    <input type="email" placeholder="Your Email" style="padding: 8px; width: 100%; margin-bottom: 10px; border-radius: 4px; border: none; background: #333; color: white;">
+                    <button type="submit" class="submit-btn" style="padding: 8px;">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Disaster Alert System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div class="emergency-button" id="emergencyButton">
+        <i class="fas fa-exclamation"></i>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Animate elements when they come into view
+            const animateOnScroll = () => {
+                const elements = document.querySelectorAll('.animate');
+                elements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+                    
+                    if (elementPosition < windowHeight - 100) {
+                        element.style.opacity = 1;
+                        const animation = element.getAttribute('data-animation');
+                        if (animation) {
+                            element.classList.add(animation);
+                        }
+                    }
+                });
+            };
+            
+            // Initial check
+            animateOnScroll();
+            
+            // Check on scroll
+            window.addEventListener('scroll', animateOnScroll);
+            
+            // Emergency button functionality
+            const emergencyButton = document.getElementById('emergencyButton');
+            emergencyButton.addEventListener('click', () => {
+                window.location.href = 'tel:911';
+            });
+            
+            // Form submission
+            const contactForm = document.getElementById('contact-form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    alert('Thank you for your message! Our team will respond as soon as possible.');
+                    contactForm.reset();
+                });
+            }
+            
+            // Add hover animations to all cards
+            const cards = document.querySelectorAll('.alert, .resource-card, .weather-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-10px) scale(1.02)';
+                    card.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.4)';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = '';
+                    card.style.boxShadow = '';
+                });
+            });
+            
+            // Add ripple effect to buttons
+            const buttons = document.querySelectorAll('.cta-button, .resource-link, .submit-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const x = e.clientX - e.target.getBoundingClientRect().left;
+                    const y = e.clientY - e.target.getBoundingClientRect().top;
+                    
+                    const ripple = document.createElement('span');
+                    ripple.classList.add('ripple');
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                        if (this.href) {
+                            window.location.href = this.href;
+                        }
+                    }, 1000);
+                });
+            });
+            
+            // Simulate real-time alert updates
+            setInterval(() => {
+                const alerts = [
+                    { 
+                        title: "Wildfire Alert", 
+                        description: "Wildfire detected within 20 miles of Pine Valley. Evacuation orders for affected areas.", 
+                        type: "emergency",
+                        time: "Just now",
+                        location: "Pine Valley"
+                    },
+                    { 
+                        title: "Tornado Watch", 
+                        description: "Conditions favorable for tornado formation in the region. Stay alert for warnings.", 
+                        type: "alert",
+                        time: "30 mins ago",
+                        location: "Central Plains"
+                    },
+                    { 
+                        title: "Flash Flood Warning", 
+                        description: "Heavy rains causing flash flooding in low-lying areas. Avoid travel if possible.", 
+                        type: "emergency",
+                        time: "1 hour ago",
+                        location: "River Basin"
+                    }
+                ];
+                
+                const randomAlert = alerts[Math.floor(Math.random() * alerts.length)];
+                const alertContainer = document.getElementById('alerts-container');
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert ${randomAlert.type === 'emergency' ? 'emergency' : ''}`;
+                alertDiv.innerHTML = `
+                    <h3><i class="fas ${randomAlert.type === 'emergency' ? 'fa-skull-crossbones' : 'fa-exclamation-triangle'}"></i> ${randomAlert.title}</h3>
+                    <p>${randomAlert.description}</p>
+                    <div class="alert-meta">
+                        <span><i class="far fa-clock"></i> ${randomAlert.time}</span>
+                        <span><i class="fas fa-map-marker-alt"></i> ${randomAlert.location}</span>
+                    </div>
+                `;
+                
+                alertContainer.insertBefore(alertDiv, alertContainer.firstChild);
+                
+                // Remove oldest alert if more than 5
+                if (alertContainer.children.length > 5) {
+                    alertContainer.removeChild(alertContainer.lastChild);
+                }
+                
+                // Add animation to new alert
+                setTimeout(() => {
+                    alertDiv.style.animation = 'fadeInUp 0.5s ease-out, float 6s ease-in-out infinite';
+                    alertDiv.style.opacity = 1;
+                }, 100);
+                
+            }, 30000); // Update every 30 seconds
+            
+            // Update weather data periodically
+            setInterval(() => {
+                const temps = document.querySelectorAll('.temp');
+                temps.forEach(temp => {
+                    const currentTemp = parseInt(temp.textContent);
+                    const change = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+                    const newTemp = currentTemp + change;
+                    temp.textContent = `${newTemp}°F`;
+                    
+                    // Add animation
+                    temp.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        temp.style.transform = 'scale(1)';
+                    }, 300);
+                });
+            }, 60000); // Update every minute
+            
+            // Add parallax effect to hero section
+            window.addEventListener('scroll', () => {
+                const homeSection = document.getElementById('home');
+                const scrollPosition = window.pageYOffset;
+                homeSection.style.backgroundPositionY = `${scrollPosition

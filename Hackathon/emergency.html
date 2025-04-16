@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Emergency Contacts</title>
+  <style>
+    /* Base Styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      background: linear-gradient(180deg, #f7f9fc, #e3e9f0);
+      color: #333;
+    }
+
+    /* Emergency Contact Section */
+    #croppedPart {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 40px;
+      border-radius: 15px;
+      border: 1px solid #b0c4de;
+      background: linear-gradient(135deg, #ffffff, #eef2f6);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    /* Header Styling */
+    #croppedPart h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #013a6b;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+
+    /* Paragraph Styling */
+    #croppedPart p {
+      font-size: 1.3rem;
+      color: #555;
+      margin-bottom: 30px;
+    }
+
+    /* List Styling */
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    ul li {
+      font-size: 1.2rem;
+      color: #333;
+      padding: 12px;
+      border-bottom: 1px solid #dcdcdc;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    ul li:last-child {
+      border-bottom: none;
+    }
+
+    ul li strong {
+      color: #013a6b;
+    }
+
+    /* Hover Effect for List Items */
+    ul li:hover {
+      background-color: #eef2f6;
+      cursor: pointer;
+      transform: scale(1.02);
+    }
+
+    /* Footer Styling */
+    footer {
+      text-align: center;
+      padding: 15px 0;
+      margin-top: 40px;
+      font-size: 0.9rem;
+      color: #888;
+      border-top: 1px solid #dcdcdc;
+    }
+
+    /* Fade-in Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="croppedPart">
+    <h1>Emergency Contacts</h1>
+    <p>Quick access to vital emergency contacts during disasters:</p>
+    <ul>
+      <li><strong>Police:</strong> 100</li>
+      <li><strong>Fire Department:</strong> 101</li>
+      <li><strong>Ambulance:</strong> 102</li>
+      <li><strong>Disaster Management Helpline:</strong> 1078</li>
+    </ul>
+  </div>
+
+  <footer>
+    &copy; 2025 Disaster Alert. All rights reserved.
+  </footer>
+</body>
+</html>
