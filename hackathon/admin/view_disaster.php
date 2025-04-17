@@ -1,13 +1,13 @@
 <?php
 session_start();
+include('config.php');
 
-// Redirect if admin is not logged in
+// Ensure admin is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header("Location: admin_login.php");
     exit();
 }
 
-$admin_username = $_SESSION['admin_username'];
 // Handle deletion
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $id = intval($_GET['delete']);
@@ -39,7 +39,7 @@ $result = $conn->query("SELECT * FROM DisasterInformation ORDER BY DateOccurred 
         <h2>Disaster Records</h2>
         <div>
             <a href="add_disaster.php" class="btn btn-primary me-2">+ Add New Disaster</a>
-            <a href="admin_panel.php" class="btn btn-secondary">← Back to Admin Panel</a>
+            <a href="admin_dashboard.php" class="btn btn-secondary">← Back to Admin Dashboard</a>
         </div>
     </div>
 
@@ -86,4 +86,3 @@ $result = $conn->query("SELECT * FROM DisasterInformation ORDER BY DateOccurred 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
