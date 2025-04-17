@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Disaster Safety Info</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f4f7;
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    /* Smooth scroll behavior */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Floating animation */
+    @keyframes floating {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    /* Gradient animation */
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Pulse animation */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* Fade-in animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Button glow */
+    @keyframes glow {
+      0% { box-shadow: 0 0 5px rgba(22, 160, 133, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(22, 160, 133, 0.8); }
+      100% { box-shadow: 0 0 5px rgba(22, 160, 133, 0.5); }
+    }
+
+    header {
+      background: linear-gradient(-45deg, #2c3e50, #16a085, #2980b9, #2c3e50);
+      background-size: 400% 400%;
+      color: white;
+      text-align: center;
+      padding: 40px 10px;
+      box-shadow: 0 5px 30px rgba(0,0,0,0.2);
+      position: relative;
+      overflow: hidden;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.3;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      animation: fadeIn 1s ease-out, floating 6s ease-in-out infinite;
+      position: relative;
+    }
+
+    .section {
+      background: white;
+      margin: 30px auto;
+      padding: 30px;
+      max-width: 900px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: all 0.4s ease;
+      animation: fadeIn 0.8s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(to bottom, #16a085, #2c3e50);
+      transition: all 0.4s ease;
+    }
+
+    .section:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+
+    .section:hover::after {
+      width: 10px;
+    }
+
+    h2, h3 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      position: relative;
+      display: inline-block;
+    }
+
+    h2::after, h3::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: linear-gradient(to right, #16a085, #2c3e50);
+      border-radius: 3px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    ul li {
+      padding: 12px 0 12px 45px;
+      margin-bottom: 8px;
+      position: relative;
+      transition: all 0.3s ease;
+      border-bottom: 1px dashed #eee;
+      animation: fadeIn 0.6s ease-out;
+      animation-fill-mode: both;
+    }
+
+    ul li:nth-child(1) { animation-delay: 0.1s; }
+    ul li:nth-child(2) { animation-delay: 0.2s; }
+    ul li:nth-child(3) { animation-delay: 0.3s; }
+    ul li:nth-child(4) { animation-delay: 0.4s; }
+    ul li:nth-child(5) { animation-delay: 0.5s; }
+
+    ul li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 30px;
+      background: #16a085;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 3px 10px rgba(22, 160, 133, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    ul li:hover {
+      color: #16a085;
+      transform: translateX(10px);
+      border-bottom-color: #16a085;
+    }
+
+    ul li:hover::before {
+      background: #2c3e50;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    /* Map styling */
+    #map {
+      width: 100%;
+      height: 500px;
+      margin-top: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      transition: all 0.4s ease;
+      border: 1px solid rgba(0,0,0,0.1);
+      z-index: 1;
+    }
+
+    #map:hover {
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      transform: translateY(-5px);
+    }
+
+    /* Search box styling */
+    .search-container {
+      display: flex;
+      margin: 30px auto;
+      max-width: 900px;
+      padding: 0 20px;
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    #location-input {
+      flex: 1;
+      padding: 15px 20px;
+      border: 2px solid #16a085;
+      border-radius: 8px 0 0 8px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    #location-input:focus {
+      border-color: #2c3e50;
+      box-shadow: 0 5px 20px rgba(44, 62, 80, 0.1);
+    }
+    
+    #search-btn {
+      padding: 15px 25px;
+      background: linear-gradient(45deg, #16a085, #2c3e50);
+      color: white;
+      border: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(22, 160, 133, 0.4);
+      font-family: 'Poppins', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    #search-btn:hover {
+      background: linear-gradient(45deg, #2c3e50, #16a085);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(22, 160, 133, 0.6);
+      animation: glow 2s infinite;
+    }
+
+    /* Info window styling */
+    .info-window {
+      padding: 15px;
+      min-width: 200px;
+    }
+    
+    .info-window h3 {
+      margin-top: 0;
+      color: #2c3e50;
+      font-size: 18px;
+    }
+    
+    .info-window p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    
+    .rescue-time {
+      font-weight: bold;
+      color: #e74c3c;
+      font-size: 16px;
+      padding: 5px 0;
+      border-top: 1px solid #eee;
+      margin-top: 10px;
+    }
+
+    /* Loading indicator */
+    .loader {
+      display: none;
+      border: 4px solid rgba(243, 243, 243, 0.8);
+      border-top: 4px solid #16a085;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Location info text */
+    #location-info {
+      margin-top: 20px;
+      font-style: italic;
+      color: #7f8c8d;
+      text-align: center;
+      animation: fadeIn 0.8s ease-out;
+      font-size: 15px;
+    }
+
+    /* Floating particles */
+    .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      animation: float linear infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) translateX(0); opacity: 1; }
+      100% { transform: translateY(-1000px) translateX(200px); opacity: 0; }
+    }
+
+    /* Custom Leaflet marker styles */
+    .leaflet-marker-icon {
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .user-marker {
+      background-color: #3498db;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      border: 3px solid white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .police-marker {
+      background-color: #2980b9;
+    }
+
+    .fire-marker {
+      background-color: #e74c3c;
+    }
+
+    .ambulance-marker {
+      background-color: #2ecc71;
+    }
+
+    .ndrf-marker {
+      background-color: #f39c12;
+    }
+
+    .disaster-marker {
+      background-color: #9b59b6;
+    }
+
+    /* Responsive styles */
+    @media(max-width: 768px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      
+      .search-container {
+        flex-direction: column;
+        padding: 0 15px;
+      }
+      
+      #location-input {
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+      
+      #search-btn {
+        border-radius: 8px;
+        width: 100%;
+      }
+      
+      #map {
+        height: 400px;
+      }
+      
+      .section {
+        padding: 25px 20px;
+        margin: 20px 15px;
+      }
+    }
+
+    @media(max-width: 480px) {
+      header h1 {
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+      }
+      
+      #map {
+        height: 350px;
+      }
+      
+      ul li {
+        padding: 10px 0 10px 35px;
+      }
+      
+      ul li::before {
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Location-Info.</h1>
+    <div class="particles" id="particles"></div>
+  </header>
+
+  <div class="section">
+    <h2>Rescue Team Locations</h2>
+    <div class="search-container">
+      <input type="text" id="location-input" placeholder="Search another city...">
+      <button id="search-btn">Search Rescue Teams</button>
+    </div>
+    <div id="map"></div>
+    <div id="location-info" style="margin-top: 15px; font-style: italic;"></div>
+    <div class="loader" id="loader"></div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Leaflet plugins -->
+  <script src="https://unpkg.com/leaflet.locatecontrol@0.78.0/dist/L.Control.Locate.min.js"></script>
+  <script src="https://unpkg.com/leaflet-geosearch@3.10.1/dist/geosearch.umd.js"></script>
+  
+  <script>
+    let map, userMarker, rescueTeamMarkers = [];
+    const searchBtn = document.getElementById('search-btn');
+    const locationInput = document.getElementById('location-input');
+    const loader = document.getElementById('loader');
+    const locationInfo = document.getElementById('location-info');
+    let userLocation = null;
+    let geocoder;
+
+    // Create floating particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = window.innerWidth < 768 ? 20 : 50;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Random properties
+        const size = Math.random() * 5 + 3;
+        const posX = Math.random() * window.innerWidth;
+        const duration = Math.random() * 20 + 10;
+        const delay = Math.random() * 5;
+        
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${posX}px`;
+        particle.style.bottom = `-${size}px`;
+        particle.style.animationDuration = `${duration}s`;
+        particle.style.animationDelay = `${delay}s`;
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Initialize the map
+    function initMap() {
+      // Default to India center
+      const defaultLocation = [20.5937, 78.9629];
+      
+      // Create the map
+      map = L.map('map').setView(defaultLocation, 5);
+      
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      
+      // Add locate control
+      L.control.locate({
+        position: 'topright',
+        strings: {
+          title: "Show my location"
+        },
+        locateOptions: {
+          maxZoom: 15
+        }
+      }).addTo(map);
+      
+      // Initialize the geocoder
+      const searchProvider = new GeoSearch.OpenStreetMapProvider();
+      geocoder = {
+        geocode: function(query, callback) {
+          searchProvider.search({ query: query })
+            .then(results => {
+              if (results.length > 0) {
+                const result = results[0];
+                callback([{
+                  y: result.y,
+                  x: result.x,
+                  label: result.label,
+                  bounds: result.bounds
+                }], 'OK');
+              } else {
+                callback([], 'ZERO_RESULTS');
+              }
+            })
+            .catch(error => {
+              console.error('Geocoding error:', error);
+              callback([], 'ERROR');
+            });
+        }
+      };
+      
+      // Try to get user's current location
+      if (navigator.geolocation) {
+        loader.style.display = 'block';
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            userLocation = [position.coords.latitude, position.coords.longitude];
+            showUserLocation(userLocation);
+            findNearbyRescueTeams(userLocation);
+            loader.style.display = 'none';
+          },
+          (error) => {
+            console.error("Error getting location:", error);
+            locationInfo.textContent = "Could not get your location. Showing default map.";
+            loader.style.display = 'none';
+          }
+        );
+      } else {
+        locationInfo.textContent = "Geolocation is not supported by this browser.";
+      }
+    }
+
+    // Show user's location on map
+    function showUserLocation(location) {
+      // Remove existing user marker if any
+      if (userMarker) {
+        map.removeLayer(userMarker);
+      }
+      
+      // Center map on user location
+      map.setView(location, 12);
+      
+      // Add user marker
+      userMarker = L.circleMarker(location, {
+        radius: 10,
+        fillColor: "#3498db",
+        color: "#fff",
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 0.8,
+        className: 'user-marker'
+      }).addTo(map);
+      
+      // Add popup
+      userMarker.bindPopup(`
+        <div class="info-window">
+          <h3>Your Location</h3>
+          <p>Lat: ${location[0].toFixed(4)}</p>
+          <p>Lng: ${location[1].toFixed(4)}</p>
+        </div>
+      `);
+      
+      locationInfo.textContent = "Showing rescue teams within 50km of your current location";
+    }
+
+    // Find nearby rescue teams (simulated data)
+    function findNearbyRescueTeams(centerLocation) {
+      loader.style.display = 'block';
+      
+      // Clear existing rescue team markers
+      rescueTeamMarkers.forEach(marker => map.removeLayer(marker));
+      rescueTeamMarkers = [];
+      
+      // In a real app, this would be an API call to get actual rescue teams
+      // Here we simulate rescue teams around the location
+      const teamTypes = ['Police', 'Fire Station', 'Ambulance', 'NDRF', 'Disaster Response'];
+      
+      // Generate 8-12 random rescue teams within 50km
+      const teamCount = 8 + Math.floor(Math.random() * 5);
+      
+      for (let i = 0; i < teamCount; i++) {
+        // Generate random location within 50km
+        const distance = Math.random() * 50; // 0-50 km
+        const bearing = Math.random() * 360; // 0-360 degrees
+        
+        const teamLocation = calculateOffsetLocation(centerLocation, distance, bearing);
+        const teamType = teamTypes[Math.floor(Math.random() * teamTypes.length)];
+        const teamName = `${teamType} Team ${i+1}`;
+        
+        // Calculate distance and estimated arrival time
+        const straightDistance = calculateDistance(centerLocation, teamLocation); // in km
+        
+        // Estimated time considering obstacles (1.5x straight line distance)
+        const effectiveDistance = straightDistance * 1.5;
+        // Average speed 40km/h for rescue vehicles
+        const estimatedTime = Math.round((effectiveDistance / 40) * 60); // in minutes
+        
+        // Determine marker color based on team type
+        let markerColor;
+        let markerClass;
+        switch(teamType) {
+          case 'Police':
+            markerColor = '#2980b9';
+            markerClass = 'police-marker';
+            break;
+          case 'Fire Station':
+            markerColor = '#e74c3c';
+            markerClass = 'fire-marker';
+            break;
+          case 'Ambulance':
+            markerColor = '#2ecc71';
+            markerClass = 'ambulance-marker';
+            break;
+          case 'NDRF':
+            markerColor = '#f39c12';
+            markerClass = 'ndrf-marker';
+            break;
+          default:
+            markerColor = '#9b59b6';
+            markerClass = 'disaster-marker';
+        }
+        
+        // Create marker
+        const marker = L.circleMarker(teamLocation, {
+          radius: 8,
+          fillColor: markerColor,
+          color: "#fff",
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.8,
+          className: markerClass
+        }).addTo(map);
+        
+        // Add popup
+        marker.bindPopup(`
+          <div class="info-window">
+            <h3>${teamName}</h3>
+            <p>Type: ${teamType}</p>
+            <p>Distance: ${straightDistance.toFixed(1)} km</p>
+            <p class="rescue-time">Estimated arrival: ${estimatedTime} mins</p>
+          </div>
+        `);
+        
+        rescueTeamMarkers.push(marker);
+      }
+      
+      loader.style.display = 'none';
+    }
+
+    // Helper function to calculate distance between two points in km
+    function calculateDistance(latLng1, latLng2) {
+      const R = 6371; // Earth's radius in km
+      const dLat = (latLng2[0] - latLng1[0]) * Math.PI / 180;
+      const dLng = (latLng2[1] - latLng1[1]) * Math.PI / 180;
+      const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(latLng1[0] * Math.PI / 180) * Math.cos(latLng2[0] * Math.PI / 180) * 
+        Math.sin(dLng/2) * Math.sin(dLng/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    // Helper function to calculate offset location
+    function calculateOffsetLocation(origin, distanceKm, bearing) {
+      const lat1 = origin[0] * Math.PI / 180;
+      const lon1 = origin[1] * Math.PI / 180;
+      const d = distanceKm / 6371; // Earth's radius in km
+      const brng = bearing * Math.PI / 180;
+      
+      const lat2 = Math.asin(
+        Math.sin(lat1) * Math.cos(d) +
+        Math.cos(lat1) * Math.sin(d) * Math.cos(brng)
+      );
+      
+      const lon2 = lon1 + Math.atan2(
+        Math.sin(brng) * Math.sin(d) * Math.cos(lat1),
+        Math.cos(d) - Math.sin(lat1) * Math.sin(lat2)
+      );
+      
+      return [
+        lat2 * 180 / Math.PI,
+        lon2 * 180 / Math.PI
+      ];
+    }
+
+    // Function to geocode the location input
+    function geocodeLocation(location) {
+      loader.style.display = 'block';
+      geocoder.geocode(location, function(results, status) {
+        if (status === 'OK' && results.length > 0) {
+          const result = results[0];
+          userLocation = [result.y, result.x];
+          showUserLocation(userLocation);
+          findNearbyRescueTeams(userLocation);
+          locationInfo.textContent = `Showing rescue teams within 50km of ${result.label}`;
+        } else {
+          alert('Location not found. Please try another city.');
+        }
+        loader.style.display = 'none';
+      });
+    }
+
+    // Event listener for search button
+    searchBtn.addEventListener('click', function() {
+      const location = locationInput.value.trim();
+      if (location) {
+        geocodeLocation(location);
+      } else {
+        alert('Please enter a location to search.');
+      }
+    });
+
+    // Initialize the map and particles when window loads
+    window.onload = function() {
+      initMap();
+      createParticles();
+      
+      // Add animation to all sections on scroll
+      const sections = document.querySelectorAll('.section');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.animation = 'fadeIn 0.8s ease-out forwards';
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      sections.forEach(section => {
+        observer.observe(section);
+      });
+    };
+  </script>
+</body>
+</html>
