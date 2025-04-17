@@ -798,7 +798,7 @@
         <p>Stay informed about potential hazards in your area</p>
         <div id="alerts-container">
             <div class="alert animate delay-1">
-                <h3><i class="fas fa-exclamation-triangle"></i><a href="Wet-DECT.html"> Flood & Earthquack Info </a></h3>
+                <h3><i class="fas fa-exclamation-triangle"></i><a href="Wet-DECT.html"> Flood & Earthquacke Info </a></h3>
                 <p>Flood: Move to higher ground immediately and avoid walking or driving through floodwaters.
                     <br>
                     Earthquake: Drop, cover, and hold on under sturdy furniture until shaking stops.
