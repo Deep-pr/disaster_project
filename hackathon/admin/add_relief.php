@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
 
         <div class="mt-4">
-            <a href="admin_panel.php" class="btn btn-link">← Back to Admin Panel</a>
+            <a href="admin_dashboard.php" class="btn btn-link">← Back to Admin Dashboard</a>
         </div>
     </div>
 </div>
