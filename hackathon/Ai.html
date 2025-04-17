@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Disaster Severity Classifier</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 30px;
+      background: linear-gradient(135deg, #f3f4f6, #e0e7ff);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      color: #1e3a8a;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2rem;
+      position: relative;
+      padding-bottom: 15px;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(to right, #4f46e5, #6366f1);
+      border-radius: 2px;
+    }
+
+    .input-group {
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 5px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+      transform: translateY(-2px);
+    }
+
+    input:hover {
+      border-color: #a5b4fc;
+    }
+
+    .input-icon {
+      position: absolute;
+      right: 15px;
+      top: 40px;
+      font-size: 1.2rem;
+    }
+
+    button {
+      padding: 14px 28px;
+      background: linear-gradient(to right, #4f46e5, #6366f1);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+      transition: all 0.3s ease;
+      display: block;
+      margin: 30px auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+    }
+
+    button:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(20, 20);
+        opacity: 0;
+      }
+    }
+
+    .result, .extra-info {
+      margin-top: 25px;
+      font-size: 1.1em;
+      font-weight: 500;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-width: 600px;
+      line-height: 1.6;
+      border-left: 5px solid;
+    }
+
+    .result {
+      border-left-color: #6366f1;
+    }
+
+    .result:hover, .extra-info:hover {
+      transform: scale(1.02) translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+
+    .extra-info {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 25px;
+      margin-top: 0;
+      transition: all 0.5s ease;
+    }
+
+    .extra-info.visible {
+      opacity: 1;
+      max-height: 1000px;
+      padding: 25px;
+      margin-top: 25px;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-top: 15px;
+    }
+
+    li {
+      margin-bottom: 8px;
+      position: relative;
+      padding-left: 25px;
+    }
+
+    li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: #4f46e5;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      input, button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🌪️ AI Disaster Severity Classifier</h2>
+
+    <div class="input-group">
+      <label for="flood">🌊 Flood Level (in meters):</label>
+      <input type="number" id="flood" step="0.1" placeholder="e.g. 1.5" />
+      <span class="input-icon">💧</span>
+    </div>
+
+    <div class="input-group">
+      <label for="wind">💨 Wind Speed (in km/h):</label>
+      <input type="number" id="wind" placeholder="e.g. 80" />
+      <span class="input-icon">🌬️</span>
+    </div>
+
+    <button id="checkBtn" onclick="classifySeverity()">Check Severity</button>
+
+    <div class="result" id="result"></div>
+    <div class="extra-info" id="extraInfo"></div>
+  </div>
+
+  <script>
+    function classifySeverity() {
+      const flood = parseFloat(document.getElementById("flood").value);
+      const wind = parseFloat(document.getElementById("wind").value);
+      const resultEl = document.getElementById("result");
+      const extraInfoEl = document.getElementById("extraInfo");
+
+      if (isNaN(flood) || isNaN(wind)) {
+        resultEl.textContent = "❗ Please enter valid flood level and wind speed.";
+        resultEl.style.color = "crimson";
+        extraInfoEl.classList.remove("visible");
+        return;
+      }
+
+      let severity = "";
+      let color = "";
+      let message = "";
+      let borderColor = "";
+
+      if (flood > 2 || wind > 100) {
+        severity = "🚨 High Severity";
+        color = "crimson";
+        borderColor = "crimson";
+        message = `
+          <strong>Safety Tips:</strong>
+          <ul>
+            <li>Stay indoors and move to higher ground if necessary</li>
+            <li>Keep emergency kits and important documents ready</li>
+            <li>Avoid driving or walking through flooded areas</li>
+            <li>Stay updated with official alerts and warnings</li>
+            <li>Charge your phone and have a power backup if possible</li>
+          </ul>
+        `;
+      } else if ((flood >= 1 && flood <= 2) || (wind >= 60 && wind <= 100)) {
+        severity = "⚠️ Moderate Severity";
+        color = "orange";
+        borderColor = "orange";
+        message = `
+          <p>🟡 Stay cautious and monitor the situation. Everything is under control, but be alert and prepared.</p>
+          <strong>Recommended actions:</strong>
+          <ul>
+            <li>Secure outdoor objects that could blow away</li>
+            <li>Prepare an emergency kit with essentials</li>
+            <li>Identify safe routes to higher ground</li>
+            <li>Monitor weather updates regularly</li>
+          </ul>
+        `;
+      } else {
+        severity = "✅ Low Severity";
+        color = "green";
+        borderColor = "green";
+        message = `
+          <p>🟢 All clear! Conditions are safe. Stay informed and enjoy your day!</p>
+          <strong>Maintenance tips:</strong>
+          <ul>
+            <li>Review your emergency preparedness plan</li>
+            <li>Check your home for potential vulnerabilities</li>
+            <li>Stay informed about weather patterns</li>
+            <li>Consider volunteering to help others prepare</li>
+          </ul>
+        `;
+      }
+
+      resultEl.textContent = `Severity Level: ${severity}`;
+      resultEl.style.color = color;
+      resultEl.style.borderLeftColor = borderColor;
+      extraInfoEl.innerHTML = message;
+      extraInfoEl.style.borderLeftColor = borderColor;
+      
+      // Trigger the animation
+      setTimeout(() => {
+        extraInfoEl.classList.add("visible");
+      }, 10);
+
+      // Button animation
+      const btn = document.getElementById("checkBtn");
+      btn.style.transform = "scale(0.95)";
+      setTimeout(() => {
+        btn.style.transform = "scale(1)";
+      }, 200);
+    }
+  </script>
+
+</body>
+</html>
