@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weather Digester</title>
+  <style>
+    :root {
+      --bg: #f0f0f0;
+      --text: #000;
+      --card: #fff;
+      --primary: #007BFF;
+    }
+
+    [data-theme="dark"] {
+      --bg: #121212;
+      --text: #fff;
+      --card: #1f1f1f;
+      --primary: #00BFFF;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .container {
+      width: 360px;
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 10px;
+      width: 100%;
+    }
+
+    input {
+      border: 1px solid #ccc;
+    }
+
+    button {
+      border: none;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+    }
+
+    .secondary-btn {
+      background: #28a745;
+    }
+
+    .toggle-btn {
+      background: #6c757d;
+      margin-top: 10px;
+    }
+
+    .weather-info img {
+      width: 80px;
+    }
+
+    .forecast {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+
+    .forecast-day {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 10px;
+      background: var(--bg);
+      margin: 0 2px;
+      font-size: 12px;
+    }
+
+    .recent {
+      margin-top: 1rem;
+    }
+
+    .recent span {
+      display: inline-block;
+      background: #e0e0e0;
+      color: #333;
+      padding: 5px 10px;
+      border-radius: 20px;
+      margin: 2px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <div class="container">
+    <h2>Weather Digester</h2>
+    <input type="text" id="cityInput" placeholder="Enter city">
+    <button onclick="getWeatherByCity()">Search</button>
+    <button class="secondary-btn" onclick="getWeatherByLocation()">Use My Location</button>
+    <button class="toggle-btn" onclick="toggleTheme()">Toggle Light/Dark</button>
+
+    <div class="weather-info" id="weatherInfo"></div>
+    <div class="forecast" id="forecastContainer"></div>
+    <div class="recent" id="recentSearches"></div>
+  </div>
+
+  <script>
+    const apiKey = "a14b5dc973cf1d84bf75ada034567e19"; // Replace with your OpenWeatherMap API key
+
+    const weatherInfo = document.getElementById("weatherInfo");
+    const forecastContainer = document.getElementById("forecastContainer");
+    const recentSearchesEl = document.getElementById("recentSearches");
+
+    function toggleTheme() {
+      const current = document.body.getAttribute("data-theme");
+      document.body.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+    }
+
+    function saveRecentSearch(city) {
+      let history = JSON.parse(localStorage.getItem("weatherHistory")) || [];
+      history = [city, ...history.filter(c => c !== city)].slice(0, 5);
+      localStorage.setItem("weatherHistory", JSON.stringify(history));
+      displayRecentSearches();
+    }
+
+    function displayRecentSearches() {
+      let history = JSON.parse(localStorage.getItem("weatherHistory")) || [];
+      recentSearchesEl.innerHTML = history.map(city =>
+        `<span onclick="getWeatherByCity('${city}')">${city}</span>`).join('');
+    }
+
+    function displayWeather(data) {
+      const iconUrl = `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+      weatherInfo.innerHTML = `
+        <img src="${iconUrl}" alt="icon">
+        <p><strong>${data.name}</strong></p>
+        <p><strong>${data.main.temp}°C</strong>, ${data.weather[0].description}</p>
+        <p>Humidity: ${data.main.humidity}% | Wind: ${data.wind.speed} km/h</p>
+      `;
+    }
+
+    function displayForecast(forecastList) {
+      forecastContainer.innerHTML = '';
+      const days = forecastList.filter((_, i) => i % 8 === 0).slice(0, 5);
+
+      days.forEach(day => {
+        const date = new Date(day.dt_txt);
+        const icon = day.weather[0].icon;
+        forecastContainer.innerHTML += `
+          <div class="forecast-day">
+            <p>${date.toDateString().slice(0, 3)}</p>
+            <img src="http://openweathermap.org/img/wn/${icon}.png" alt="">
+            <p>${Math.round(day.main.temp)}°C</p>
+          </div>
+        `;
+      });
+    }
+
+    async function getWeatherByCity(cityName) {
+      const city = cityName || document.getElementById("cityInput").value;
+      if (!city) return weatherInfo.innerHTML = "<p>Please enter a city</p>";
+
+      weatherInfo.innerHTML = "<p>Loading...</p>";
+
+      try {
+        const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`);
+        if (!weatherRes.ok) throw new Error("City not found");
+        const data = await weatherRes.json();
+        displayWeather(data);
+        saveRecentSearch(city);
+
+        const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`);
+        const forecastData = await forecastRes.json();
+        displayForecast(forecastData.list);
+      } catch (err) {
+        weatherInfo.innerHTML = `<p>Error: ${err.message}</p>`;
+      }
+    }
+
+    function getWeatherByLocation() {
+      if (!navigator.geolocation) {
+        return weatherInfo.innerHTML = "<p>Geolocation not supported</p>";
+      }
+
+      weatherInfo.innerHTML = "<p>Detecting your location...</p>";
+
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+
+        try {
+          const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`);
+          const data = await weatherRes.json();
+          displayWeather(data);
+          saveRecentSearch(data.name);
+
+          const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`);
+          const forecastData = await forecastRes.json();
+          displayForecast(forecastData.list);
+        } catch (err) {
+          weatherInfo.innerHTML = `<p>Error: ${err.message}</p>`;
+        }
+      }, () => {
+        weatherInfo.innerHTML = "<p>Location permission denied</p>";
+      });
+    }
+
+    displayRecentSearches();
+  </script>
+</body>
+</html>
