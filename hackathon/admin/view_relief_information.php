@@ -43,7 +43,7 @@ $result = $conn->query($sql);
         <h2 class="mb-0">All Relief Information</h2>
         <div>
             <a href="add_relief.php" class="btn btn-success me-2">+ Add New Relief Info</a>
-            <a href="admin_panel.php" class="btn btn-secondary">← Back to Admin Panel</a>
+            <a href="admin_dashboard.php" class="btn btn-secondary">← Back to Admin Dashboard</a>
         </div>
     </div>
 
