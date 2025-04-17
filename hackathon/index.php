@@ -836,9 +836,9 @@
                 <div class="resource-icon">
                     <i class="fas fa-map-marked-alt"></i>
                 </div>
-                <h3>Evacuation Plans</h3>
-                <p>Maps and routes for safe evacuation from your area in case of emergency.</p>
-                <a href="#" class="resource-link">View Plans</a>
+                <h3>Weather Detection</h3>
+                <p>Know the weather report of your surrounding area.</p>
+                <a href="Weather.html" class="resource-link">View Weather</a>
             </div>
             <div class="resource-card animate delay-1">
                 <div class="resource-icon">
