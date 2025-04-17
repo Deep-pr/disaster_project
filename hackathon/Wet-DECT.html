@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Disaster Alert System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f2f2f2;
+    }
+    h1 {
+      text-align: center;
+    }
+    #alertBox {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px gray;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+    .btn {
+      padding: 10px 20px;
+      background-color: teal;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .btn:hover {
+      background-color: darkslategray;
+    }
+    #map {
+      height: 450px;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
+    #searchBar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🌍 Real-Time Disaster Alert System</h1>
+
+<div id="alertBox">
+  <div id="searchBar">
+    <input type="text" id="locationInput" placeholder="Enter city, state, or country...">
+    <button class="btn" onclick="searchLocation()">Search</button>
+  </div>
+  <p><strong>📍 Location:</strong> <span id="location">Detecting...</span></p>
+  <p><strong>🌋 Earthquake Risk:</strong> <span id="quake">Checking...</span></p>
+  <p><strong>🌊 Flood Risk:</strong> <span id="flood">Checking...</span></p>
+  <p><strong>💡 AI Tips:</strong></p>
+  <ul id="tips"></ul>
+  <button class="btn" onclick="getLocation()">🔄 Refresh Current Location Alerts</button>
+  <div id="map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+  let map, marker;
+
+  function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+  }
+
+  function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  async function fetchEarthquakeData(lat, lon) {
+    const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson');
+    const data = await res.json();
+    let risk = "Safe", tips = [], color = "green";
+
+    data.features.forEach(quake => {
+      const [qLon, qLat] = quake.geometry.coordinates;
+      const mag = quake.properties.mag;
+      const distance = getDistanceFromLatLonInKm(lat, lon, qLat, qLon);
+      if (distance <= 100 && mag >= 4.0) {
+        if (mag >= 6) {
+          risk = "Severe"; tips.push("Drop, Cover, and Hold On."); color = "red";
+        } else {
+          risk = "Mild"; tips.push("Check for damage around you."); color = "orange";
+        }
+      }
+    });
+
+    return { risk, tips, color, data };
+  }
+
+  function markNearbyQuakes(lat, lon, data) {
+    data.features.forEach(quake => {
+      const [qLon, qLat] = quake.geometry.coordinates;
+      const mag = quake.properties.mag;
+      const place = quake.properties.place;
+      const distance = getDistanceFromLatLonInKm(lat, lon, qLat, qLon);
+
+      if (distance <= 100) {
+        let color = mag >= 6 ? 'red' : mag >= 4 ? 'orange' : 'green';
+        L.circleMarker([qLat, qLon], {
+          color: color,
+          radius: 6,
+          fillColor: color,
+          fillOpacity: 0.7
+        }).addTo(map).bindPopup(`${place}<br>Mag: ${mag}, ${Math.round(distance)}km away`);
+      }
+    });
+  }
+
+  function checkFloodRisk() {
+    return {
+      risk: "Safe",
+      tips: ["No flood warnings currently."]
+    };
+  }
+
+  function showMap(lat, lon, color) {
+    if (!map) {
+      map = L.map('map').setView([lat, lon], 8);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+    } else {
+      map.setView([lat, lon], 8);
+      if (marker) map.removeLayer(marker);
+    }
+
+    marker = L.circleMarker([lat, lon], {
+      color: color,
+      radius: 10,
+      fillColor: color,
+      fillOpacity: 0.8
+    }).addTo(map)
+      .bindPopup(`<b>Selected Location</b><br>Risk: ${color.toUpperCase()}`)
+      .openPopup();
+  }
+
+  async function displayAlerts(lat, lon, placeText = null) {
+    document.getElementById("location").innerText = placeText || `Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}`;
+    const quakeData = await fetchEarthquakeData(lat, lon);
+    const floodData = checkFloodRisk();
+
+    document.getElementById("quake").innerText = quakeData.risk;
+    document.getElementById("flood").innerText = floodData.risk;
+
+    const tipsList = document.getElementById("tips");
+    tipsList.innerHTML = '';
+    [...quakeData.tips, ...floodData.tips].forEach(tip => {
+      const li = document.createElement('li');
+      li.innerText = tip;
+      tipsList.appendChild(li);
+    });
+
+    showMap(lat, lon, quakeData.color);
+    markNearbyQuakes(lat, lon, quakeData.data);
+
+    // ✅ Zone-based alert popup
+    if (quakeData.risk === "Severe") {
+      alert("🚨 WARNING: You are in a high-risk earthquake zone! Take precautions immediately.");
+    } else if (quakeData.risk === "Mild") {
+      alert("🟠 You are in a mild risk zone. Stay aware and stay safe.");
+    } else {
+      alert("✅ You are in a safe zone. No immediate disaster threats.");
+    }
+
+    // ✅ Desktop browser notification
+    if (Notification.permission === "granted" && (quakeData.risk !== "Safe" || floodData.risk !== "Safe")) {
+      new Notification("⚠️ Disaster Alert", {
+        body: `Earthquake: ${quakeData.risk}, Flood: ${floodData.risk}`
+      });
+    }
+  }
+
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        displayAlerts(pos.coords.latitude, pos.coords.longitude);
+      }, () => {
+        document.getElementById("location").innerText = "Location access denied.";
+      });
+    } else {
+      document.getElementById("location").innerText = "Geolocation not supported.";
+    }
+  }
+
+  async function searchLocation() {
+    const locationInput = document.getElementById("locationInput").value.trim();
+    if (!locationInput) return alert("Please enter a location.");
+
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}`;
+    const res = await fetch(url);
+    const results = await res.json();
+
+    if (results.length === 0) {
+      alert("Location not found.");
+      return;
+    }
+
+    const loc = results[0];
+    const lat = parseFloat(loc.lat);
+    const lon = parseFloat(loc.lon);
+    displayAlerts(lat, lon, locationInput);
+  }
+
+  if (Notification.permission !== "granted") {
+    Notification.requestPermission();
+  }
+
+  getLocation();
+</script>
+
+</body>
+</html>
