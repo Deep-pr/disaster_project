@@ -7,7 +7,6 @@ The dashboard displays live disaster alerts (floods, earthquakes, storms, etc.) 
 
 Data includes disaster type, location, intensity, and time of occurrence.
 
-The dashboard refreshes periodically (e.g., every 30 seconds) to ensure up-to-date information.
 
 Visualization: Interactive maps (using Leaflet.js or Google Maps API) and color-coded alerts (red for high risk, yellow for moderate).
 
