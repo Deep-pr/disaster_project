@@ -838,7 +838,7 @@
                 </div>
                 <h3>Weather Detection</h3>
                 <p>Know the weather report of your surrounding area.</p>
-                <a href="Weather.html" class="resource-link">View Weather</a>
+                <a href="Weather.html" class="resource-link" target="_blank">View Weather</a>
             </div>
             <div class="resource-card animate delay-1">
                 <div class="resource-icon">
