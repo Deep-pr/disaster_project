@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Disaster Safety Information</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #eaf3fa;
+      color: #333;
+      animation: fadeIn 1.5s ease;
+      line-height: 1.6;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      background: linear-gradient(45deg, #2b6dad, #1e4c7d);
+      color: white;
+      text-align: center;
+      padding: 30px 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      animation: headerAnimation 2s ease-out;
+    }
+
+    @keyframes headerAnimation {
+      0% { transform: translateY(-100px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .search-bar {
+      text-align: center;
+      margin: 30px 10px;
+      animation: fadeIn 1s ease-out;
+    }
+
+    .search-bar input {
+      padding: 12px;
+      width: 300px;
+      font-size: 16px;
+      border-radius: 30px;
+      border: 2px solid #1e4c7d;
+      transition: 0.3s;
+    }
+
+    .search-bar input:focus {
+      outline: none;
+      border-color: #2b6dad;
+      box-shadow: 0 0 10px rgba(43, 109, 173, 0.3);
+    }
+
+    .search-bar button {
+      padding: 12px 20px;
+      margin-left: 10px;
+      background-color: #2b6dad;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .search-bar button:hover {
+      background-color: #1e4c7d;
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .section {
+      background: white;
+      margin: 30px 0;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, background-color 0.3s ease;
+      animation: sectionAnimation 1s ease-out;
+    }
+
+    .section:hover {
+      transform: translateY(-5px);
+      background-color: #f0f7ff;
+    }
+
+    @keyframes sectionAnimation {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    h2, h3 {
+      color: #2b6dad;
+      margin-bottom: 20px;
+      animation: colorChange 3s infinite alternate;
+      position: relative;
+      padding-bottom: 10px;
+    }
+
+    h2::after, h3::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #2b6dad, #1e4c7d);
+      border-radius: 3px;
+    }
+
+    @keyframes colorChange {
+      0% { color: #2b6dad; }
+      100% { color: #1e4c7d; }
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin-bottom: 20px;
+    }
+
+    ul li {
+      padding: 10px 10px 10px 35px;
+      margin-bottom: 10px;
+      position: relative;
+      transition: all 0.3s ease;
+      background-color: #f8fafc;
+      border-radius: 5px;
+      border-left: 4px solid #2b6dad;
+    }
+
+    ul li::before {
+      content: "✓";
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      color: #1e4c7d;
+      font-weight: bold;
+    }
+
+    ul li:hover {
+      transform: translateX(5px);
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .disaster-type {
+      margin-bottom: 40px;
+    }
+
+    .disaster-type h3 {
+      color: #e74c3c;
+      margin-top: 25px;
+    }
+
+    .emergency-contacts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .contact-card {
+      background: linear-gradient(135deg, #f8fafc, #e6f0fa);
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+
+    .contact-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .contact-card h4 {
+      color: #2b6dad;
+      margin-bottom: 10px;
+    }
+
+    .contact-card p {
+      font-weight: bold;
+      color: #e74c3c;
+    }
+
+    footer {
+      background: linear-gradient(45deg, #1e4c7d, #2b6dad);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 50px;
+    }
+
+    @media(max-width: 600px) {
+      .search-bar input, .search-bar button {
+        width: 90%;
+        margin: 5px 0;
+      }
+
+      header h1 {
+        font-size: 2rem;
+      }
+      
+      .section {
+        padding: 20px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Disaster Safety Information</h1>
+  <p>Essential guidelines to keep you and your family safe during emergencies</p>
+</header>
+
+<div class="container">
+  <div class="section" id="generalSafety">
+    <h2>General Safety Guidelines</h2>
+    
+    <div class="disaster-type">
+      <h3>Before Any Disaster</h3>
+      <ul>
+        <li>Create an emergency plan with family meeting spots and evacuation routes</li>
+        <li>Prepare an emergency kit with food, water, medications, and supplies for at least 3 days</li>
+        <li>Learn how to turn off utilities (gas, water, electricity) in your home</li>
+        <li>Keep important documents in a waterproof, portable container</li>
+        <li>Stay informed about potential risks in your area</li>
+      </ul>
+    </div>
+    
+    <div class="disaster-type">
+      <h3>During Any Disaster</h3>
+      <ul>
+        <li>Stay calm and follow your emergency plan</li>
+        <li>Listen to official alerts and instructions from authorities</li>
+        <li>Help children, elderly, and people with disabilities first</li>
+        <li>Avoid using phones except for serious emergencies to keep lines clear</li>
+        <li>If evacuating, take your emergency kit and follow designated routes</li>
+      </ul>
+    </div>
+    
+    <div class="disaster-type">
+      <h3>After Any Disaster</h3>
+      <ul>
+        <li>Check yourself and others for injuries</li>
+        <li>Be aware of new safety issues created by the disaster (downed power lines, gas leaks, etc.)</li>
+        <li>Listen to news reports for information about relief efforts</li>
+        <li>Use text messages or social media to communicate to keep phone lines open</li>
+        <li>Document any property damage with photographs for insurance claims</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" id="specificDisasters">
+    <h2>Specific Disaster Preparedness</h2>
+    
+    <div class="disaster-type">
+      <h3>Earthquakes</h3>
+      <ul>
+        <li><strong>Before:</strong> Secure heavy furniture and appliances to walls</li>
+        <li><strong>During:</strong> Drop, Cover, and Hold On under sturdy furniture</li>
+        <li><strong>During:</strong> Stay indoors until shaking stops and it's safe to exit</li>
+        <li><strong>After:</strong> Check for gas leaks before using matches or electrical switches</li>
+        <li><strong>After:</strong> Be prepared for aftershocks</li>
+      </ul>
+    </div>
+    
+    <div class="disaster-type">
+      <h3>Floods</h3>
+      <ul>
+        <li><strong>Before:</strong> Know your area's flood risk and elevation</li>
+        <li><strong>During:</strong> Move to higher ground immediately if instructed</li>
+        <li><strong>During:</strong> Never walk, swim, or drive through flood waters</li>
+        <li><strong>After:</strong> Avoid flood water as it may be contaminated</li>
+        <li><strong>After:</strong> Be aware of areas where flood waters have receded</li>
+      </ul>
+    </div>
+    
+    <div class="disaster-type">
+      <h3>Cyclones</h3>
+      <ul>
+        <li><strong>Before:</strong> Install storm shutters or board up windows</li>
+        <li><strong>During:</strong> Stay in an interior room away from windows</li>
+        <li><strong>During:</strong> Beware of the eye of the storm - conditions may temporarily improve</li>
+        <li><strong>After:</strong> Avoid flooded roads and washed out bridges</li>
+        <li><strong>After:</strong> Use flashlights instead of candles to prevent fires</li>
+      </ul>
+    </div>
+    
+    
+    
+    
+  </div>
+
+
+
+  <div class="section" id="emergencyKit">
+    <h2>Emergency Kit Checklist</h2>
+    <ul>
+      <li><strong>Water:</strong> 1 gallon per person per day (3-day supply)</li>
+      <li><strong>Food:</strong> 3-day supply of non-perishable food</li>
+      <li><strong>First aid kit:</strong> With essential medications</li>
+      <li><strong>Flashlight:</strong> With extra batteries</li>
+      <li><strong>Whistle:</strong> To signal for help</li>
+      <li><strong>Dust masks:</strong> To help filter contaminated air</li>
+      <li><strong>Tools:</strong> Wrench or pliers to turn off utilities</li>
+      <li><strong>Cell phone:</strong> With chargers and backup battery</li>
+      <li><strong>Cash:</strong> ATMs may not work during power outages</li>
+      <li><strong>Important documents:</strong> Copies of insurance, IDs, bank records</li>
+      <li><strong>Blankets:</strong> Or sleeping bags for warmth</li>
+      <li><strong>Personal hygiene items:</strong> Sanitation and personal care</li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2023 Disaster Safety Information. Stay safe and prepared.</p>
+</footer>
+
+<script>
+  // Simple search functionality
+  document.querySelector('.search-bar button').addEventListener('click', function() {
+    const searchTerm = document.querySelector('.search-bar input').value.toLowerCase();
+    const sections = document.querySelectorAll('.section');
+    
+    sections.forEach(section => {
+      const text = section.textContent.toLowerCase();
+      if(text.includes(searchTerm)) {
+        section.style.display = 'block';
+        // Scroll to the section
+        section.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        section.style.display = 'none';
+      }
+    });
+    
+    if(searchTerm === '') {
+      sections.forEach(section => {
+        section.style.display = 'block';
+      });
+    }
+  });
+  
+  // Allow search on Enter key press
+  document.querySelector('.search-bar input').addEventListener('keypress', function(e) {
+    if(e.key === 'Enter') {
+      document.querySelector('.search-bar button').click();
+    }
+  });
+</script>
+</body>
+</html>
